@@ -1847,8 +1847,10 @@ public:
 	#endif
 		m_pPlugin->impl()->setParameter(id, value, 0);
 		qtractorPlugin::Param *pParam = m_pPlugin->findParamId(int(id));
-		if (pParam)
+		if (pParam) {
+			pParam->setValueEnabled(true);
 			pParam->updateValue(float(value), false);
+		}
 		return kResultOk;
 	}
 
@@ -1869,10 +1871,12 @@ public:
 			m_restarting = true;
 			if (flags & Vst::kReloadComponent)
 				m_pPlugin->impl()->deactivate();
+			m_pPlugin->resetParamValues(true);
 			QByteArray data;
 			if (m_pPlugin->impl()->getState(data))
 				m_pPlugin->impl()->setState(data);
 			m_pPlugin->updateParamValues(true);
+			m_pPlugin->resetParamValues(false);
 			if (flags & Vst::kReloadComponent)
 				m_pPlugin->impl()->activate();
 			m_restarting = false;
@@ -2738,6 +2742,9 @@ void qtractorVst3Plugin::Impl::selectProgram ( int iBank, int iProg )
 //		/ Vst::ParamValue(m_programParamInfo.stepCount);
 	setParameter(id, value, 0);
 	controller->setParamNormalized(id, value);
+
+ 	// HACK: Make sure all displayed parameter values are in sync.
+	m_pPlugin->resetParamValues(false);
 }
 
 
@@ -3172,6 +3179,8 @@ void qtractorVst3Plugin::updateParam (
 	const Vst::ParamValue value = Vst::ParamValue(fValue);
 	m_pImpl->setParameter(id, value, 0);
 	controller->setParamNormalized(id, value);
+
+	pVst3Param->setValueEnabled(true);
 }
 
 
@@ -3191,7 +3200,7 @@ void qtractorVst3Plugin::updateParamValues ( bool bUpdate )
 	const qtractorPlugin::Params::ConstIterator param_end = params.constEnd();
 	for ( ; param != param_end; ++param) {
 		Param *pParam = static_cast<Param *> (param.value());
-		if (pParam && pParam->impl()) {
+		if (pParam && pParam->impl() && pParam->isValueEnabled()) {
 			const Vst::ParamID id = pParam->impl()->paramInfo().id;
 			const float fValue = float(m_pImpl->getParameter(id));
 			if (pParam->value() != fValue) {
@@ -3203,6 +3212,22 @@ void qtractorVst3Plugin::updateParamValues ( bool bUpdate )
 
 	if (nupdate > 0)
 		updateFormDirtyCount();
+}
+
+
+// Parameters enablement method.
+void qtractorVst3Plugin::resetParamValues ( bool bEnabled )
+{
+	const qtractorPlugin::Params& params = qtractorPlugin::params();
+	qtractorPlugin::Params::ConstIterator param = params.constBegin();
+	const qtractorPlugin::Params::ConstIterator param_end = params.constEnd();
+	for ( ; param != param_end; ++param) {
+		Param *pParam = static_cast<Param *> (param.value());
+		if (pParam)
+			pParam->setValueEnabled(bEnabled);
+	}
+
+	updateFormDirtyCount();
 }
 
 
@@ -3225,8 +3250,8 @@ void qtractorVst3Plugin::configure (
 		qDebug("qtractorVst3Plugin[%p]::configure() data.size=%d", this, int(data.size()));
 	#endif
 		m_pImpl->setState(data);
-		// HACK: Make sure all displayed parameter values are in sync.
-		updateParamValues(true);
+		// HACK: Make sure all parameter values are in sync.
+		resetParamValues(false);
 	}
 }
 
@@ -3618,7 +3643,7 @@ bool qtractorVst3Plugin::loadPresetFile ( const QString& sFilename )
 	file.close();
 
 	// HACK: Make sure all displayed parameter values are in sync.
-	updateParamValues(true);
+	resetParamValues(false);
 
 	return bResult;
 }
@@ -3689,7 +3714,8 @@ void qtractorVst3Plugin::clearAll (void)
 // Constructor.
 qtractorVst3Plugin::Param::Param (
 	qtractorVst3Plugin *pPlugin, unsigned long iIndex )
-	: qtractorPlugin::Param(pPlugin, iIndex), m_pImpl(nullptr)
+	: qtractorPlugin::Param(pPlugin, iIndex), m_pImpl(nullptr),
+		m_bValueEnabled(false)
 {
 	qtractorVst3PluginType *pType
 		= static_cast<qtractorVst3PluginType *> (pPlugin->type());
