@@ -1742,9 +1742,8 @@ public:
 
 protected:
 
-	// Plugin module (de)initializer.
+	// Plugin module initializer.
 	void initialize ();
-	void deinitialize ();
 
 	// Cleanup.
 	void clear ();
@@ -2191,7 +2190,22 @@ qtractorVst3Plugin::Impl::Impl ( qtractorVst3Plugin *pPlugin )
 // Destructor.
 qtractorVst3Plugin::Impl::~Impl (void)
 {
-	deinitialize();
+	closeEditor();
+
+	deactivate();
+
+	qtractorVst3PluginType *pType
+		= static_cast<qtractorVst3PluginType *> (m_pPlugin->type());
+	if (pType) {
+		Vst::IEditController *controller = pType->impl()->controller();
+		if (controller)
+			controller->setComponentHandler(nullptr);
+	}
+
+	m_processor = nullptr;
+	m_handler = nullptr;
+
+	clear();
 }
 
 
@@ -2292,60 +2306,30 @@ void qtractorVst3Plugin::Impl::initialize (void)
 			}
 		}
 	}
-
-	activate(component, Vst::kEvent, Vst::kOutput, true);
-	activate(component, Vst::kEvent, Vst::kInput,  true);
-	activate(component, Vst::kAudio, Vst::kOutput, true);
-	activate(component, Vst::kAudio, Vst::kInput,  true);
-	component->setActive(true);
-}
-
-
-// Plugin module (de)initializer.
-void qtractorVst3Plugin::Impl::deinitialize (void)
-{
-	closeEditor();
-
-	deactivate();
-
-	qtractorVst3PluginType *pType
-		= static_cast<qtractorVst3PluginType *> (m_pPlugin->type());
-	if (pType) {
-		Vst::IComponent *component = pType->impl()->component();
-		if (component) {
-			component->setActive(false);
-			activate(component, Vst::kEvent, Vst::kOutput, false);
-			activate(component, Vst::kEvent, Vst::kInput,  false);
-			activate(component, Vst::kAudio, Vst::kOutput, false);
-			activate(component, Vst::kAudio, Vst::kInput,  false);
-		}
-		Vst::IEditController *controller = pType->impl()->controller();
-		if (controller)
-			controller->setComponentHandler(nullptr);
-	}
-
-	m_processor = nullptr;
-	m_handler = nullptr;
-
-	clear();
 }
 
 
 // Do the actual (de)activation.
 void qtractorVst3Plugin::Impl::activate (void)
 {
-	if (!m_processing && m_processor) {
-		m_processor->setProcessing(true);
-		g_hostContext.processAddRef();
-		m_processing = true;
-	}
+	if (m_processing)
+		return;
 
 	qtractorVst3PluginType *pType
 		= static_cast<qtractorVst3PluginType *> (m_pPlugin->type());
-	if (pType) {
-		Vst::IComponent *component = pType->impl()->component();
-		if (component)
-			component->setActive(true);
+	if (pType == nullptr)
+		return;
+
+	Vst::IComponent *component = pType->impl()->component();
+	if (component && m_processor) {
+		activate(component, Vst::kAudio, Vst::kInput,  true);
+		activate(component, Vst::kAudio, Vst::kOutput, true);
+		activate(component, Vst::kEvent, Vst::kInput,  true);
+		activate(component, Vst::kEvent, Vst::kOutput, true);
+		component->setActive(true);
+		m_processor->setProcessing(true);
+		g_hostContext.processAddRef();
+		m_processing = true;
 	}
 
 #ifdef CONFIG_DEBUG
@@ -2356,18 +2340,24 @@ void qtractorVst3Plugin::Impl::activate (void)
 
 void qtractorVst3Plugin::Impl::deactivate (void)
 {
+	if (!m_processing)
+		return;
+
 	qtractorVst3PluginType *pType
 		= static_cast<qtractorVst3PluginType *> (m_pPlugin->type());
-	if (pType) {
-		Vst::IComponent *component = pType->impl()->component();
-		if (component)
-			component->setActive(false);
-	}
+	if (pType == nullptr)
+		return;
 
-	if (m_processing && m_processor) {
+	Vst::IComponent *component = pType->impl()->component();
+	if (component && m_processor) {
 		g_hostContext.processReleaseRef();
 		m_processor->setProcessing(false);
+		component->setActive(false);
 		m_processing = false;
+		activate(component, Vst::kEvent, Vst::kOutput, false);
+		activate(component, Vst::kEvent, Vst::kInput,  false);
+		activate(component, Vst::kAudio, Vst::kOutput, false);
+		activate(component, Vst::kAudio, Vst::kInput,  false);
 	}
 
 #ifdef CONFIG_DEBUG
@@ -2996,7 +2986,23 @@ qtractorVst3Plugin::qtractorVst3Plugin (
 // Destructor.
 qtractorVst3Plugin::~qtractorVst3Plugin (void)
 {
-	deinitialize();
+	// Cleanup all plugin instances...
+	cleanup();	// setChannels(0);
+
+	// Deallocate I/O audio buffer pointers.
+	if (m_ppIBuffer)
+		delete [] m_ppIBuffer;
+	if (m_ppOBuffer)
+		delete [] m_ppOBuffer;
+
+	if (m_pfIDummy)
+		delete [] m_pfIDummy;
+	if (m_pfODummy)
+		delete [] m_pfODummy;
+
+	// Deallocate MIDI decoder.
+	if (m_pMidiParser)
+		snd_midi_event_free(m_pMidiParser);
 
 	delete m_pImpl;
 }
@@ -3038,29 +3044,6 @@ void qtractorVst3Plugin::initialize (void)
 
 	// Instantiate each instance properly...
 	setChannels(channels());
-}
-
-
-// Plugin instance de-initializer.
-void qtractorVst3Plugin::deinitialize (void)
-{
-	// Cleanup all plugin instances...
-	cleanup();	// setChannels(0);
-
-	// Deallocate I/O audio buffer pointers.
-	if (m_ppIBuffer)
-		delete [] m_ppIBuffer;
-	if (m_ppOBuffer)
-		delete [] m_ppOBuffer;
-
-	if (m_pfIDummy)
-		delete [] m_pfIDummy;
-	if (m_pfODummy)
-		delete [] m_pfODummy;
-
-	// Deallocate MIDI decoder.
-	if (m_pMidiParser)
-		snd_midi_event_free(m_pMidiParser);
 }
 
 
