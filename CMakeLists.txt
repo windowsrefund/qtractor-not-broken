@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.15)
 
 project (Qtractor
-  VERSION 1.1.1
+  VERSION 1.2.0
   DESCRIPTION "An Audio/MIDI multi-track sequencer"
   HOMEPAGE_URL "https://qtractor.org"
   LANGUAGES C CXX)
@@ -800,6 +800,11 @@ endif ()
 
 add_subdirectory (src)
 
+
+# Finally check whether Qt is statically linked.
+if (QT_FEATURE_static)
+  set(QT_VERSION "${QT_VERSION}-static")
+endif ()
 
 # Configuration status
 macro (SHOW_OPTION text value)
