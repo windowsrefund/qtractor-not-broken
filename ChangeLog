@@ -6,8 +6,14 @@ ChangeLog
 
 GIT HEAD
 
-- Connections: connector line colors are now uniquely mapped
-  on a (readable/output) client name basis. (EXPERIMENTAL)
+- Fixed a partial port-name filtering issue on the MIDI Connections
+  widget. (fixes GH issue #471)
+
+- Last selected automation curve color is now persistent and the
+  default for all later automation curves.
+
+- Connections: connector line colors are now uniquely mapped on a
+  (readable/output) client name basis.
 
 
 1.2.0  2024-08-29  A Mid-Summer'24 Release.
