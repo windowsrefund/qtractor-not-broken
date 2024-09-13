@@ -1874,6 +1874,7 @@ void qtractorPluginList::setChannels (
 		m_bAudioOutputAutoConnect = m_pMidiManager->isAudioOutputAutoConnect();
 		m_sAudioOutputBusName = m_pMidiManager->audioOutputBusName();
 		m_bAudioOutputMonitor = m_pMidiManager->isAudioOutputMonitor();
+		m_pMidiManager->setAudioOutputMonitorEx(false);
 		qtractorMidiManager::deleteMidiManager(m_pMidiManager);
 		m_pMidiManager = nullptr;
 	}
@@ -2161,6 +2162,7 @@ qtractorPlugin *qtractorPluginList::copyPlugin ( qtractorPlugin *pPlugin )
 	qtractorPlugin *pNewPlugin = qtractorPluginFactory::createPlugin(this,
 		sFilename, pType->index(), pType->typeHint());
 	if (pNewPlugin) {
+		pNewPlugin->setAlias(pPlugin->alias());
 		pNewPlugin->setPreset(pPlugin->preset());
 		pNewPlugin->setConfigs(pPlugin->configs());
 		pNewPlugin->setConfigTypes(pPlugin->configTypes());
