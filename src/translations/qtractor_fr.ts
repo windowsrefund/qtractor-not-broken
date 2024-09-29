@@ -34,16 +34,16 @@ Audio :	%1 canaux, %2 Hz</translation>
         <translation>	(%1 demi-tons de décalage de la tonalité)</translation>
     </message>
     <message>
-        <location filename="../qtractorAudioEngine.cpp" line="3088"/>
-        <location filename="../qtractorAudioEngine.cpp" line="3380"/>
+        <location filename="../qtractorAudioEngine.cpp" line="3087"/>
+        <location filename="../qtractorAudioEngine.cpp" line="3379"/>
         <location filename="../qtractorMidiEngine.cpp" line="4337"/>
         <location filename="../qtractorMidiEngine.cpp" line="4913"/>
         <source>%1 In</source>
         <translation>%1 Entrée</translation>
     </message>
     <message>
-        <location filename="../qtractorAudioEngine.cpp" line="3097"/>
-        <location filename="../qtractorAudioEngine.cpp" line="3380"/>
+        <location filename="../qtractorAudioEngine.cpp" line="3096"/>
+        <location filename="../qtractorAudioEngine.cpp" line="3379"/>
         <location filename="../qtractorMidiEngine.cpp" line="4346"/>
         <location filename="../qtractorMidiEngine.cpp" line="4913"/>
         <source>%1 Out</source>
@@ -503,7 +503,7 @@ MIDI:	</translation>
     <message>
         <location filename="../qtractorPlugin.cpp" line="572"/>
         <source>Aux Send: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Envoi aux : %1</translation>
     </message>
     <message>
         <location filename="../qtractorPlugin.cpp" line="2413"/>
@@ -563,7 +563,7 @@ MIDI:	</translation>
     <message>
         <location filename="../qtractorPluginCommand.cpp" line="612"/>
         <source>plugin alias</source>
-        <translation type="unfinished"></translation>
+        <translation>alis de greffon</translation>
     </message>
     <message>
         <location filename="../qtractorPluginCommand.cpp" line="854"/>
@@ -668,15 +668,15 @@ MIDI:	</translation>
         <translation>%1 Volume</translation>
     </message>
     <message>
-        <location filename="../qtractorAudioEngine.cpp" line="3090"/>
-        <location filename="../qtractorAudioEngine.cpp" line="3099"/>
+        <location filename="../qtractorAudioEngine.cpp" line="3089"/>
+        <location filename="../qtractorAudioEngine.cpp" line="3098"/>
         <location filename="../qtractorTrack.cpp" line="706"/>
         <source>%1 Gain</source>
         <translation>%1 Gain</translation>
     </message>
     <message>
-        <location filename="../qtractorAudioEngine.cpp" line="3092"/>
-        <location filename="../qtractorAudioEngine.cpp" line="3101"/>
+        <location filename="../qtractorAudioEngine.cpp" line="3091"/>
+        <location filename="../qtractorAudioEngine.cpp" line="3100"/>
         <location filename="../qtractorMidiEngine.cpp" line="4341"/>
         <location filename="../qtractorMidiEngine.cpp" line="4350"/>
         <location filename="../qtractorTrack.cpp" line="709"/>
@@ -13484,12 +13484,12 @@ Voulez-vous appliquer les changements ?</translation>
     <message>
         <location filename="../qtractorPluginForm.ui" line="130"/>
         <source>Alias:</source>
-        <translation type="unfinished"></translation>
+        <translation>Alias :</translation>
     </message>
     <message>
         <location filename="../qtractorPluginForm.ui" line="146"/>
         <source>Plugin alias</source>
-        <translation type="unfinished"></translation>
+        <translation>Alias de greffon</translation>
     </message>
     <message>
         <location filename="../qtractorPluginForm.ui" line="159"/>
@@ -13725,7 +13725,7 @@ Are you sure?</source>
     <message>
         <location filename="../qtractorPluginListView.cpp" line="1360"/>
         <source>Aux Send: </source>
-        <translation type="unfinished"></translation>
+        <translation>Envoi aux :</translation>
     </message>
     <message>
         <location filename="../qtractorPluginListView.cpp" line="1679"/>
