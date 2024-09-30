@@ -1365,6 +1365,22 @@ void qtractorAudioAuxSendPlugin::setAudioBusName (
 			pAudioEngine->findOutputBus(sAudioBusName));
 	}
 
+	if (pAudioBus) {
+		qtractorPluginList *pPluginList = list();
+		if (pPluginList
+			&& (pPluginList->flags() & qtractorPluginList::AudioOutBus)) {
+			for (qtractorBus *pBus = pAudioEngine->buses().first();
+					pBus; pBus = pBus->next()) {
+				if ((pBus->busMode() & qtractorBus::Output) &&
+					(pBus->pluginList_out() == pPluginList) &&
+					(pBus->busName() == sAudioBusName)) {
+					pAudioBus = nullptr;
+					break;
+				}
+			}
+		}
+	}
+
 	if (pAudioBus && pAudioBus->channels() == channels()) {
 		if (bReset && sAudioBusName != m_sAudioBusName)
 			pAudioEngine->resetAudioOutBus(pAudioBus, list());
@@ -1613,6 +1629,22 @@ void qtractorMidiAuxSendPlugin::setMidiBusName ( const QString& sMidiBusName )
 	}
 
 	if (pMidiBus) {
+		qtractorPluginList *pPluginList = list();
+		if (pPluginList
+			&& (pPluginList->flags() & qtractorPluginList::MidiOutBus)) {
+			for (qtractorBus *pBus = pMidiEngine->buses().first();
+					pBus; pBus = pBus->next()) {
+				if ((pBus->busMode() & qtractorBus::Output) &&
+					(pBus->pluginList_out() == pPluginList) &&
+					(pBus->busName() == sMidiBusName)) {
+					pMidiBus = nullptr;
+					break;
+				}
+			}
+		}
+	}
+
+	if (pMidiBus) {
 		m_pMidiBus = pMidiBus;
 		m_sMidiBusName = sMidiBusName;
 	//	setConfig("midiBusName", m_sMidiBusName);
@@ -1666,7 +1698,7 @@ QString qtractorMidiAuxSendPlugin::title (void) const
 	if (qtractorPlugin::alias().isEmpty()) {
 		const QString sMidiBusName
 			= (m_pMidiBus ? m_sMidiBusName : QObject::tr("(none)"));
-		sTitle = QObject::tr("%1 (Audio)").arg(sMidiBusName);
+		sTitle = QObject::tr("%1 (MIDI)").arg(sMidiBusName);
 	} else {
 		sTitle = qtractorPlugin::title();
 	}
