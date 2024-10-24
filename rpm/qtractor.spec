@@ -17,8 +17,8 @@
 
 Summary:	An Audio/MIDI multi-track sequencer
 Name:		qtractor
-Version:	1.2.0
-Release:	4.1
+Version:	1.3.0
+Release:	5.1
 License:	GPL-2.0-or-later
 Group:		Productivity/Multimedia/Sound/Midi
 Source:		%{name}-%{version}.tar.gz
@@ -48,10 +48,10 @@ BuildRequires:	gcc-c++ >= 10
 %endif
 %if 0%{qt_major_version} == 6
 %if 0%{?sle_version} == 150200 && 0%{?is_opensuse}
-BuildRequires:	qtbase6.7-static >= 6.7
-BuildRequires:	qttools6.7-static
-BuildRequires:	qttranslations6.7-static
-BuildRequires:	qtsvg6.7-static
+BuildRequires:	qtbase6.8-static >= 6.8
+BuildRequires:	qttools6.8-static
+BuildRequires:	qttranslations6.8-static
+BuildRequires:	qtsvg6.8-static
 %else
 BuildRequires:	cmake(Qt6LinguistTools)
 BuildRequires:	pkgconfig(Qt6Core)
@@ -131,7 +131,7 @@ the personal home-studio.
 
 %build
 %if 0%{?sle_version} == 150200 && 0%{?is_opensuse}
-source /opt/qt6.7-static/bin/qt6.7-static-env.sh
+source /opt/qt6.8-static/bin/qt6.8-static-env.sh
 %endif
 CXX=%{_GXX} CC=%{_GCC} \
 cmake -DCMAKE_INSTALL_PREFIX=%{_prefix} -Wno-dev -B build
@@ -192,6 +192,8 @@ cmake --install build
 
 
 %changelog
+* Fri Oct  4 2024 Rui Nuno Capela <rncbc@rncbc.org> 1.3.0
+- An Early-Fall'24 Release.
 * Thu Aug 29 2024 Rui Nuno Capela <rncbc@rncbc.org> 1.2.0
 - A Mid-Summer'24 Release.
 * Mon Aug  5 2024 Rui Nuno Capela <rncbc@rncbc.org> 1.1.1

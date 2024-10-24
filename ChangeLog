@@ -6,9 +6,28 @@ ChangeLog
 
 GIT HEAD
 
-- Use timebase-aware JACK API for relocation. (GH issue #474)
+- Clip/Split now also applies to multiple selected clips, on any other
+  track than current, if the split point (play-head) is found within.
 
-- Provide `bar_start_tick` in JACK BBT information. (GH issue #475)
+- Clip Merge/Export... audio clips now taking the internal audio 
+  resolution (ie. 64 frames/period), independent to former JACK
+  /Pipewire buffer-size/period. (EXPERMENTAL) (GH Issue #481)
+
+- Clip Merge/Export... audio clips now take the internal audio period
+  resolution (64), independent of the former JACK/Pipewire buffer-size
+  /period. (EXPERINTAL) (GH Issue #481)
+
+- New Clip Mute state property introduced. (EXPERIMENTAL)
+
+- New MIDI clip tool option: Normalize / Compress. (EXPERIMENTAL)
+
+- Prepping up next development cycle (Qt >= 6.8)
+
+
+1.3.0  2024-10-04  An Early-Fall'24 Release.
+
+- Use timebase-aware JACK API for relocation; provide `bar_start_tick`
+  in JACK Transport/Timebase BBT information.
 
 - Always reset the target bus when copying or moving an Aux-Send
   insert into an audio output bus.
@@ -22,7 +41,7 @@ GIT HEAD
 - Audio Aux-sends inserted on audio output buses are not restricted
   to later buses anymore; the only restriction now is that no cyclic
   or loop-back routes are allowed; audio output buses are now sorted
-  internally in-place for correct processing order. (EXPERIMENTAL)
+  internally in-place for correct processing order.
 
 - Update all Aux-Send inserts whenever their respective output bus
   gets renamed or deleted.
@@ -31,10 +50,10 @@ GIT HEAD
   keyboard modifiers role (Shift/Ctrl), now also applying to the
   play-head and/or edit-head/tail re-positioning in the timeline.
 
-- Plug-in name/title alias makes its debut. (EXPERIMENTAL)
+- Plug-in name/title alias makes its debut.
 
 - Fixed a partial port-name filtering issue on the MIDI Connections
-  widget. (fixes GH issue #471)
+  widget.
 
 - Last selected automation curve color is now persistent and the
   default for all later automation curves.

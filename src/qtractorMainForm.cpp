@@ -932,6 +932,9 @@ qtractorMainForm::qtractorMainForm (
 	QObject::connect(m_ui.clipEditAction,
 		SIGNAL(triggered(bool)),
 		SLOT(clipEdit()));
+	QObject::connect(m_ui.clipMuteAction,
+		SIGNAL(triggered(bool)),
+		SLOT(clipMute()));
 	QObject::connect(m_ui.clipUnlinkAction,
 		SIGNAL(triggered(bool)),
 		SLOT(clipUnlink()));
@@ -4498,6 +4501,19 @@ void qtractorMainForm::clipEdit (void)
 }
 
 
+// Mute a clip.
+void qtractorMainForm::clipMute (void)
+{
+#ifdef CONFIG_DEBUG
+	qDebug("qtractorMainForm::clipMute()");
+#endif
+
+	// Mute the current clip, if any...
+	if (m_pTracks)
+		m_pTracks->muteClip();
+}
+
+
 // Unlink a (MIDI) linked clip.
 void qtractorMainForm::clipUnlink (void)
 {
@@ -6818,7 +6834,7 @@ bool qtractorMainForm::startSession (void)
 		// Uh-oh, we can't go on like this...
 		appendMessagesError(
 			tr("The audio/MIDI engine could not be started.\n\n"
-			"Make sure the JACK audio server (jackd) and\n"
+			"Make sure the JACK/Pipewire audio service and\n"
 			"the ALSA Sequencer kernel module (snd-seq-midi)\n"
 			"are up and running and then restart the session."));
 	}
@@ -7601,6 +7617,9 @@ void qtractorMainForm::updateClipMenu (void)
 	m_ui.clipNewAction->setEnabled(bEnabled);
 	m_ui.clipEditAction->setEnabled(pClip != nullptr);
 
+	m_ui.clipMuteAction->setEnabled(bClipSelected);
+	m_ui.clipMuteAction->setChecked(pClip && pClip->isClipMute());
+
 	// Special unlink (MIDI) clip...
 	qtractorMidiClip *pMidiClip = nullptr;
 	if (pTrack && pTrack->trackType() == qtractorTrack::Midi)
@@ -7611,9 +7630,10 @@ void qtractorMainForm::updateClipMenu (void)
 	m_ui.clipRecordExAction->setChecked(pTrack && pTrack->isClipRecordEx()
 		&& static_cast<qtractorMidiClip *> (pTrack->clipRecord()) == pMidiClip);
 
-	m_ui.clipSplitAction->setEnabled(pClip != nullptr
-		&& iPlayHead > pClip->clipStart()
-		&& iPlayHead < pClip->clipStart() + pClip->clipLength());
+	m_ui.clipSplitAction->setEnabled(bClipSelected
+		|| pTrack != nullptr || (pClip != nullptr
+			&& iPlayHead > pClip->clipStart()
+			&& iPlayHead < pClip->clipStart() + pClip->clipLength()));
 	m_ui.clipMergeAction->setEnabled(bSingleTrackSelected);
 	m_ui.clipNormalizeAction->setEnabled(bClipSelected);
 	m_ui.clipTempoAdjustAction->setEnabled(bClipSelected);
