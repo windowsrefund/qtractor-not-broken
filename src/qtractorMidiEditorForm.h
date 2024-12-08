@@ -131,8 +131,8 @@ protected slots:
 	void editPaste();
 	void editPasteRepeat();
 	void editDelete();
-	void editModeOn(bool bOn);
-	void editModeOff(bool bOn);
+	void editModeOn();
+	void editModeOff();
 	void editModeDraw(bool bOn);
 	void editSelectAll();
 	void editSelectNone();
