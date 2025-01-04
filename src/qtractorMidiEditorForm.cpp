@@ -1,7 +1,7 @@
 // qtractorMidiEditorForm.cpp
 //
 /****************************************************************************
-   Copyright (C) 2005-2024, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2005-2025, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -2369,7 +2369,7 @@ void qtractorMidiEditorForm::stabilizeForm (void)
 
 	m_ui.viewEventsAction->setChecked(m_pMidiEventList->isVisible());
 
-	m_pTrackNameLabel->setText(pTrack->trackName());
+	m_pTrackNameLabel->setText(pTrack->trackName().simplified());
 	m_pFileNameLabel->setText(filename());
 	m_pTrackChannelLabel->setText(sTrackChannel.arg(trackChannel() + k));
 
@@ -2396,7 +2396,8 @@ void qtractorMidiEditorForm::stabilizeForm (void)
 
 	qtractorTimeScale *pTimeScale = m_pMidiEditor->timeScale();
 	m_pDurationLabel->setText(pTimeScale->textFromTick(
-		pTimeScale->tickFromFrame(m_pMidiEditor->offset()), true, pSeq->duration()));
+		pTimeScale->tickFromFrame(m_pMidiEditor->offset()), true,
+		pSeq->duration()));
 
 	qtractorSession  *pSession  = qtractorSession::getInstance();
 	qtractorMainForm *pMainForm = qtractorMainForm::getInstance();
@@ -2573,7 +2574,7 @@ void qtractorMidiEditorForm::updateGhostTrackMenu (void)
 			pTrack; pTrack = pTrack->next()) {
 		if (pTrack->trackType() == qtractorTrack::Midi) {
 			pAction = m_ui.viewGhostTrackMenu->addAction(
-				pTrack->trackName(), this, SLOT(viewGhostTrack()));
+				pTrack->shortTrackName(), this, SLOT(viewGhostTrack()));
 			pAction->setCheckable(true);
 			pAction->setChecked(pGhostTrack == pTrack);
 			data.setValue(static_cast<void *> (pTrack));
